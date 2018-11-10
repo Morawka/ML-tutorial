@@ -1,4 +1,6 @@
-# support vector machine
+ # k-fold cross validation
+
+# in kernel SVM
 
 # Importing the libraries
 import numpy as np
@@ -6,10 +8,9 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 # Importing the dataset
-data = pd.read_pickle('prepared_data.pkl')
-X = data.iloc[:, 2:].values
-y = data.iloc[:, 1].values
-
+dataset = pd.read_csv('Social_Network_Ads.csv')
+X = dataset.iloc[:, [2, 3]].values
+y = dataset.iloc[:, 4].values
 
 # Splitting the dataset into the Training set and Test set
 from sklearn.cross_validation import train_test_split
@@ -23,8 +24,8 @@ X_test = sc_X.transform(X_test)
 
 #fitting classifier to the training set
 from sklearn.svm import SVC
-classifier = SVC(kernel = 'linear', random_state = 0)
-classifier.fit(X_train, y_train)
+classifier = SVC(kernel = 'rbf', random_state = 0)
+classifier.fit(X_test, y_test)
 
 # predicting the test results
 y_pred = classifier.predict(X_test)
@@ -32,6 +33,12 @@ y_pred = classifier.predict(X_test)
 # Making the Confusion Matrix
 from sklearn.metrics import confusion_matrix
 cm =  confusion_matrix(y_test, y_pred)
+
+# Applying k-Fold Cross Validation
+from sklearn.model_selection import cross_val_score
+accuracies = cross_val_score(estimator = classifier, X = X_train, y = y_train, cv = 10, n_jobs= 1)
+srednia = accuracies.mean()
+odchyl_std = accuracies.std()
 
 # visualising the training set results
 from matplotlib.colors import ListedColormap
@@ -45,7 +52,7 @@ plt.ylim(X2.min(), X2.max())
 for i, j in enumerate(np.unique(y_set)):
     plt.scatter(X_set[y_set == j, 0], X_set[y_set == j, 1],
                 c = ListedColormap(('red', 'green'))(i), label = j, edgecolors = 'black')
-plt.title('SVM (Training set)')
+plt.title('Classifier (Training set)')
 plt.xlabel('Age')
 plt.ylabel('Salary')
 plt.legend()
@@ -63,7 +70,7 @@ plt.ylim(X2.min(), X2.max())
 for i, j in enumerate(np.unique(y_set)):
     plt.scatter(X_set[y_set == j, 0], X_set[y_set == j, 1],
                 c = ListedColormap(('red', 'green'))(i), label = j, edgecolors = 'black')
-plt.title('SVM (Test set)')
+plt.title('Classifier (Test set)')
 plt.xlabel('Age')
 plt.ylabel('Salary')
 plt.legend()

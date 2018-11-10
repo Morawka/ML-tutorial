@@ -1,4 +1,4 @@
-# support vector machine
+# Kernel PCA
 
 # Importing the libraries
 import numpy as np
@@ -6,10 +6,9 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 # Importing the dataset
-data = pd.read_pickle('prepared_data.pkl')
-X = data.iloc[:, 2:].values
-y = data.iloc[:, 1].values
-
+dataset = pd.read_csv('Social_Network_Ads.csv')
+X = dataset.iloc[:, [2, 3]].values
+y = dataset.iloc[:, 4].values
 
 # Splitting the dataset into the Training set and Test set
 from sklearn.cross_validation import train_test_split
@@ -20,10 +19,18 @@ from sklearn.preprocessing import StandardScaler
 sc_X = StandardScaler()
 X_train = sc_X.fit_transform(X_train)
 X_test = sc_X.transform(X_test)
+"""sc_y = StandardScaler()
+y_train = sc_y.fit_transform(y_train)"""
 
-#fitting classifier to the training set
-from sklearn.svm import SVC
-classifier = SVC(kernel = 'linear', random_state = 0)
+# Applying Kernel PCA
+from sklearn.decomposition import KernelPCA
+kpca = KernelPCA(n_components = 2, kernel = 'rbf')
+X_train = kpca.fit_transform(X_train)
+X_test = kpca.transform(X_test)
+
+#fitting logistic regerssion to the training set
+from sklearn.linear_model import LogisticRegression
+classifier = LogisticRegression(random_state = 0)
 classifier.fit(X_train, y_train)
 
 # predicting the test results
@@ -45,7 +52,7 @@ plt.ylim(X2.min(), X2.max())
 for i, j in enumerate(np.unique(y_set)):
     plt.scatter(X_set[y_set == j, 0], X_set[y_set == j, 1],
                 c = ListedColormap(('red', 'green'))(i), label = j, edgecolors = 'black')
-plt.title('SVM (Training set)')
+plt.title('Logistic Regression (Training set)')
 plt.xlabel('Age')
 plt.ylabel('Salary')
 plt.legend()
@@ -63,7 +70,7 @@ plt.ylim(X2.min(), X2.max())
 for i, j in enumerate(np.unique(y_set)):
     plt.scatter(X_set[y_set == j, 0], X_set[y_set == j, 1],
                 c = ListedColormap(('red', 'green'))(i), label = j, edgecolors = 'black')
-plt.title('SVM (Test set)')
+plt.title('Logistic Regression (Test set)')
 plt.xlabel('Age')
 plt.ylabel('Salary')
 plt.legend()
